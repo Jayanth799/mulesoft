@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="6c56c53c-4900-431d-9824-6c2193c00431" >
+		<http:listener-connection host="0.0.0.0" port="8083" />
+	</http:listener-config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="17526cb7-2dd7-4a20-9ad4-eb36f90c99de" >
+		<db:mssql-connection host="MSI" instanceName="JAY" port="1433" user="sa" password="Jayanth" databaseName="dbcon_db"/>
+	</db:config>
+	<flow name="dbconFlow" doc:id="095ba56b-211b-4a4d-a5b4-84a5d28b83ba" >
+		<http:listener doc:name="/GET dbcon" doc:id="b3c6bf5b-b90c-4fe5-b702-db2c26df9a09" config-ref="HTTP_Listener_config" path="/db" allowedMethods="GET"/>
+		<db:select doc:name="Select" doc:id="d02da41e-42b7-46f5-9d34-e1b6edbee3db" config-ref="Database_Config">
+			<db:sql ><![CDATA[select * from test_table;]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="121b0670-13e1-4f50-9656-20ffbfd5b19a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
