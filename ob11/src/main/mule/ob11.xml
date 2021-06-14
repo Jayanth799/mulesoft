@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="22bea35d-411d-4a5b-b9b4-1626209408ed" >
+		<http:listener-connection host="0.0.0.0" port="8113" />
+	</http:listener-config>
+	<os:object-store name="Object_store" doc:name="Object store" doc:id="0e7d92bc-10ea-4afb-8cf1-847c32f23ec5" maxEntries="10" entryTtl="1" expirationInterval="10" expirationIntervalUnit="HOURS" />
+	<flow name="ob11Flow" doc:id="0c0410d5-fb0b-47e8-8fc0-852ab3421489" >
+		<http:listener doc:name="Listener" doc:id="c42662de-da57-49ba-a1ab-e6cc4e8937ae" config-ref="HTTP_Listener_config" path="ob1"/>
+		<ee:transform doc:name="Transform Message" doc:id="5a4ffa38-1e48-42d8-9a56-0238de695855" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<os:store doc:name="Store" doc:id="de84fd52-e8a2-44e8-bd44-d8c33a9f16e2" key="json1" objectStore="Object_store"/>
+		<os:store doc:name="Store" doc:id="748edb08-c79b-4d7b-8d2a-6b445bd49c60" key="json2" objectStore="Object_store">
+			<os:value><![CDATA[#[{
+    "isValid": true,
+    "errorMessage": " ",
+    "value": {
+          "ParNumbers": [
+                        {
+                "partnumber": "123"
+               
+            },
+            {
+                "partnumber": "1234"
+                
+            },
+            {
+                "partnumber": "12345"
+               
+            }
+        ],
+        "Mfgs": [
+            {
+                "Mfg": "100CS"
+              
+            },
+            {
+                "Mfg": "AMGCAP"
+               
+            },
+            {
+                "Mfg": "100AS"
+                
+            }
+        ]
+    }
+}]]]></os:value>
+		</os:store>
+		<os:retrieve doc:name="Retrieve" doc:id="3306acc4-3cf7-40a5-8c0e-2cba515aa3ba" key="json1" objectStore="Object_store" target="key11"/>
+		<logger level="INFO" doc:name="Logger" doc:id="aecf61f4-612b-47ab-a768-1fc394f63c75" message="#[vars.key11]"/>
+		<os:retrieve doc:name="Retrieve" doc:id="4878ec2a-602d-47fd-8657-0297a678b394" key="json2" objectStore="Object_store" target="key22"/>
+		<logger level="INFO" doc:name="Logger" doc:id="d0cb50f5-0dd5-481f-b36e-5dd3055103ed" message="#[vars.key22.value.ParNumbers.partnumber]"/>
+		<ee:transform doc:name="Transform Message" doc:id="32b96588-00a1-426d-ae08-e6296e0bcd48">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+var prodList = vars.key11
+var filea = vars.key22.value.Mfgs
+---
+filea map(sam,indexofSam) -> {
+	(
+		prodList filter($.productFamily==sam.Mfg) map{
+			'$($.productFamily)' :'$($.leadtimeOverrideDays)'
+		}
+	)
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
