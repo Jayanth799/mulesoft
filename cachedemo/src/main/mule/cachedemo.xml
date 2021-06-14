@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="dee4e2b6-4953-4b28-9a28-387c2ba8cd9e" >
+		<http:listener-connection host="0.0.0.0" port="8114" />
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="00938f6c-4065-4bbe-9fd8-b3e852fbba70" basePath="/api/users/" >
+		<http:request-connection protocol="HTTPS" host="reqres.in" />
+	</http:request-config>
+	<ee:object-store-caching-strategy name="Caching_Strategy" doc:name="Caching Strategy" doc:id="7574f496-b853-4c6a-befb-cc50250b5b83" keyGenerationExpression="#[attributes.queryParams.employeeId]" />
+	<flow name="cachedemoFlow" doc:id="fdb030c7-ba5d-4e7f-9602-dc03df8ab7bc" >
+		<http:listener doc:name="Listener" doc:id="4edc8c8a-a226-421f-9fcc-35063769c854" config-ref="HTTP_Listener_config" path="cs"/>
+		<ee:cache doc:name="Cache" doc:id="09241ec0-eca4-4d8c-a606-33f5d5f8f970" cachingStrategy-ref="Caching_Strategy">
+			<http:request method="GET" doc:name="Request" doc:id="72643bb2-fab9-40e8-88be-9473150b94fa" config-ref="HTTP_Request_configuration" path="#[attributes.queryParams.employeeId]" />
+			<logger level="INFO" doc:name="Logger" doc:id="95f87831-d453-42a5-911b-fd3ff5d381e5" message="chache is miss"/>
+		</ee:cache>
+		<logger level="INFO" doc:name="Logger" doc:id="a7c15cc7-1961-4354-9b75-140fec7bec3d" message="Cache Hits"/>
+	</flow>
+</mule>
