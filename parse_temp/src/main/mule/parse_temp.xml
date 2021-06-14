@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="36adde04-6041-496a-b3d9-89eb4eedd357" >
+		<http:listener-connection host="0.0.0.0" port="8121" />
+	</http:listener-config>
+	<flow name="parse_tempFlow" doc:id="e0665e0f-af95-4060-8e41-d806dd1a1d87" >
+		<http:listener doc:name="Listener" doc:id="306f113c-e86d-4235-8534-4d7421aec22c" config-ref="HTTP_Listener_config" path="pt"/>
+		<parse-template doc:name="Parse Template" doc:id="a72aadb6-ffd3-457b-a4d9-459cac5530bb" location="C:\Users\Jayanth Kundala\Documents\basic.html"/>
+	</flow>
+	<flow name="parse_tempFlow1" doc:id="0edb4054-69e9-45eb-ba14-12d65e51069a" >
+		<http:listener doc:name="Listener" doc:id="a7f326f4-33ed-40cd-bba2-843827197cdb" config-ref="HTTP_Listener_config" path="pt2"/>
+		<parse-template doc:name="Parse Template" doc:id="3bfe9e36-bc9e-4870-a388-934e7adb2d31" location="C:\Users\Jayanth Kundala\Documents\basic.txt"/>
+	</flow>
+</mule>
