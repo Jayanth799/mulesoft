@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="3c409fb2-e08f-474c-bb41-ba3d9a46ec58" >
+		<http:listener-connection host="0.0.0.0" port="8118" />
+	</http:listener-config>
+	<flow name="SynchronousFlow" doc:id="887f9af4-4758-4bdb-9506-26e3b8dd4d34" >
+		<http:listener doc:name="Listener" doc:id="e70648e0-0597-48ac-8147-a10b2c52f6e1" config-ref="HTTP_Listener_config" path="sync"/>
+		<set-payload value='#[[{     	"model":"samsung",     	price :"1000",     	madeIn :"koria"    },    {    	model:"nokia",    	price :"10000",		madeIn :"india"&#10;}]]' doc:name="Set Payload" doc:id="d54b643e-36f6-4a03-9695-0f9f45c36c64" />
+		<ee:transform doc:name="Transform Message" doc:id="f877e42d-dd15-4d6e-9137-f822b829347f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<flow-ref doc:name="Flow Reference" doc:id="148c2727-4e0f-4c61-9f35-10805e14a10d" name="flowsSub_Flow"/>
+		<logger level="INFO" doc:name="Logger" doc:id="9692489d-9f5b-40a7-bd0d-58c5a09ecb02" message="#[payload]"/>
+	</flow>
+	<sub-flow name="flowsSub_Flow" doc:id="7ae8210c-39c7-4099-9024-745e0be080c0" >
+		<ee:transform doc:name="Transform Message" doc:id="643ec289-5eaf-4901-b70c-a2f6e4ae09e6" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+model: payload map{
+	name: $.model	
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<flow name="ASynchronousFlow" doc:id="606a953b-2faf-4e89-9114-7bca4792ff63" >
+		<http:listener doc:name="Listener" doc:id="23e0395d-73fc-44cd-bfe3-3cf506e40068" config-ref="HTTP_Listener_config" path="async"/>
+		<set-payload value='#[[{
+		   	model:"samsung",    
+		   		price:"1000",    	madeIn:"koria"   },    {   	"model":"nokia",    	"price":"10000",		"madeIn":"india"
+}]]' doc:name="Set Payload" doc:id="8a7f3b6b-9ced-4097-9d4b-d9039049a582" />
+		<async doc:name="Async" doc:id="8864c294-40ee-4410-9684-0719a15499e1" >
+			<ee:transform doc:name="Transform Message" doc:id="f4da8c64-8864-4b62-9936-a00dd7530510" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<logger level="INFO" doc:name="Logger" doc:id="9cad7e7a-9fb5-471d-a549-f5495342c550" message="#[payload]"/>
+		</async>
+		<ee:transform doc:name="Transform Message" doc:id="6bef9a4d-d1bf-4be0-a9c1-2b911e489d5b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+models: payload map {
+	nams: $.model
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="072dbf94-e38a-415e-bcd3-01148d479fdd" message="#[payload]"/>
+	</flow>
+</mule>
