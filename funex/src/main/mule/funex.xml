@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="c89f427c-8d7e-45df-8a0a-7c90646109d8" >
+		<http:listener-connection host="0.0.0.0" port="8111" />
+	</http:listener-config>
+	<flow name="UpperCaseFlow" doc:id="47ccb14f-38d3-4af5-905d-5b2d19f24f1d" >
+		<http:listener doc:name="Listener" doc:id="97883435-e660-404f-ad43-8670d8f5d0be" config-ref="HTTP_Listener_config" path="/uc"/>
+		<ee:transform doc:name="Transform Message" doc:id="abff5249-5a4c-4a2b-b50f-86ed87d94de4" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+fun toUpper(Name) = Name match{
+	case is String -> upper(Name)
+	else -> null
+}
+---
+toUpper("Jayath")]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="LowercaseFlow" doc:id="cbedcb1e-c786-4740-a7a3-bbe5bf484db0" >
+		<http:listener doc:name="Listener" doc:id="2dde75fa-05ff-4ac1-b17b-18f10277aeb8" config-ref="HTTP_Listener_config" path="/lc"/>
+		<ee:transform doc:name="Transform Message" doc:id="cf2440fe-2359-42a4-8119-f18ee2fc9d20" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+fun toLower(name)= lower(name)
+---
+toLower("COGNINE")]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="numFlow" doc:id="6729d857-501b-44ac-bd6b-86ebe677505a" >
+		<http:listener doc:name="Listener" doc:id="89ed2097-410c-404c-a1b0-387a199c230e" config-ref="HTTP_Listener_config" path="/num"/>
+		<ee:transform doc:name="Transform Message" doc:id="5af9c552-85d1-441c-ae64-fb39545bd3ef" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+fun toPhoneFormat(str: String)= "(" ++ str[0 to 2] ++ ")" ++ str[3 to 5] ++ "-" ++ str[6 to 9]
+---
+toPhoneFormat("7997699029")]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="TypeconstrainFlow" doc:id="03820c58-90a7-440d-9989-33b8704bd871" >
+		<http:listener doc:name="Listener" doc:id="f278890a-7fd8-4950-b3f5-ada4a435d449" config-ref="HTTP_Listener_config" path="/tc"/>
+		<ee:transform doc:name="Transform Message" doc:id="8d45a105-3100-4169-bf4a-12370e4ec4eb" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+fun toUser(id: Number, userName: String): String = "you called the function toUser!" ++ id ++ userName
+---
+toUser(123,"jay")]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="funexFlow" doc:id="a4a5be68-1abd-4c78-919b-60f7b617d79b" >
+		<http:listener doc:name="Listener" doc:id="6a1dee42-89cf-4a92-97e4-eeb2add43de5" config-ref="HTTP_Listener_config" path="/op"/>
+		<ee:transform doc:name="Transform Message" doc:id="c6313139-db91-4ae8-81b5-89f222511783" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+fun createUserData(name, countryCode = "US") = { "User name" : name, "Location": countryCode}
+---
+[createUserData("Cristian", "AR"), createUserData("Max The Mule")]
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
