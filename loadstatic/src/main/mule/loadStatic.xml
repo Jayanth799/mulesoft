@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:sockets="http://www.mulesoft.org/schema/mule/sockets"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/sockets http://www.mulesoft.org/schema/mule/sockets/current/mule-sockets.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<sockets:listener-config name="Sockets_Listener_config" doc:name="Sockets Listener config" doc:id="5c4ca2d2-6966-4517-94c2-b93e8f70dcd1" >
+		<sockets:tcp-listener-connection host="localhost" port="8119" />
+	</sockets:listener-config>
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="92bac76a-7d58-41a8-aba9-6180c99fe14a" >
+		<http:listener-connection host="0.0.0.0" port="8120" />
+	</http:listener-config>
+	<flow name="scocketsFlow" doc:id="4ba54c66-c6e1-4011-a965-502f3984ceff" >
+		<http:listener doc:name="Listener" doc:id="781c55c4-5861-4953-80ed-2db4c289fb28" config-ref="HTTP_Listener_config" path="/lsr"/>
+		<http:load-static-resource doc:name="Load static resource" doc:id="292e2812-7f9a-4512-a612-801d6355c3b0" defaultFile="sample2.html" resourceBasePath="C:\Users\Jayanth Kundala\AnypointStudio\studio-workspace\scockets\src\main\resources\html"/>
+	</flow>
+</mule>
