@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="20781cf1-1ee7-4030-b7aa-80387e7b411b" >
+		<http:listener-connection host="0.0.0.0" port="8124" />
+	</http:listener-config>
+	<flow name="concatStringFlow" doc:id="cef95c53-b97e-4dd8-88fc-df74b7d0d29e" >
+		<http:listener doc:name="Listener" doc:id="498da565-eb00-4ae1-a6f4-ed396b36ccde" config-ref="HTTP_Listener_config" path="concatString"/>
+		<ee:transform doc:name="Transform Message" doc:id="5df87386-1edb-494a-8c7b-f927017ee0b3" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{myString:("hello"++"jay")}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="JsonToXmlflow" doc:id="7e20c641-b492-46e1-8357-c77bb71ddf7c" >
+		<http:listener doc:name="Listener" doc:id="b8e767e8-c8e0-46e1-8966-15ece9122694" config-ref="HTTP_Listener_config" path="jtox"/>
+		<ee:transform doc:name="Transform Message" doc:id="8396038b-4f0b-4021-a08b-50166f4718c5" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+---
+{say:("hello"++"jay")}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="xmltoJson" doc:id="7c7f81ac-e362-4eaf-a612-60f257040c1c" >
+		<http:listener doc:name="Listener" doc:id="1d4a9345-c9e8-4a03-84b8-e555abb0c8ce" config-ref="HTTP_Listener_config" path="xtoj"/>
+		<ee:transform doc:name="Transform Message" doc:id="55f17792-143a-4382-992a-a00fde5b82a0" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="supportedDatatypes" doc:id="1a36f09e-5896-4522-b49a-d7501dc322d1" >
+		<http:listener doc:name="Listener" doc:id="a327c1b2-90a0-4d05-9a17-086fe9421d04" config-ref="HTTP_Listener_config" path="datatypes"/>
+		<ee:transform doc:name="Transform Message" doc:id="637c4b7b-c695-4abb-99c2-ce06c9899b81" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  /*
+   * A multi-line
+   * comment here.
+   */
+  myString: "hello world",
+  myNumber: 123,
+  myFloatingPointNumber: 123.456,
+  myVeryBigNumber: 12341234134123412341234123,
+  myDate: |2018-12-07|,
+  myTime: |11:55:56|,
+  myDateTime: |2018-10-01T23:57:59-03:00|,
+  myBoolean: true,
+  myArray: [ 1, 2, 3, 5, 8],
+  myMixedArray: [ 1, 2, "blah", { hello: "there" } ],
+  myObjectKeyValuePair: { innerKey: "innerValue" },
+  myObjectWithConditionalField: { a : { b : 1, ( c : 2 ) if true, (d : 4) if false } },
+  myNull: null,
+  myBinary: "abcd1234123" as Binary
+  //A one-line comment here.
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="datawavebasicFlow" doc:id="eaab379a-dd7c-4db7-8b06-d4d8782e5154" >
+		<http:listener doc:name="Listener" doc:id="3605cae8-4b3e-43ae-83cc-4a08aa91a2ae" config-ref="HTTP_Listener_config" path="vardw"/>
+		<ee:transform doc:name="Transform Message" doc:id="d523d132-6b71-44be-b85e-a35e74f0c9f4" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+var myj={name:"jay"}
+output application/xml
+---
+myj]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="avgdatawavebasicFlow" doc:id="eb5ad7d4-9c76-48b9-9e60-be0e06ce195e" >
+		<http:listener doc:name="Listener" doc:id="a587b25b-3ec0-47da-bab8-cbd3e39c3846" config-ref="HTTP_Listener_config" path="avg" />
+		<ee:transform doc:name="Transform Message" doc:id="d01f02aa-37c1-4690-b70f-c1a5cd86e0d5" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+var myj={
+	a:avg([1,1000]),
+	b:avg([1,2,3])
+}
+output application/xml
+---
+myj]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="Copy_of_datawavebasicFlow" doc:id="a62c062e-3087-4499-b75f-9f4acb0f684c" >
+		<http:listener doc:name="Listener" doc:id="97db0f1d-c11f-4c25-9ff3-7570cf357fc8" config-ref="HTTP_Listener_config" path="read" />
+		<ee:transform doc:name="Transform Message" doc:id="81edb600-06b4-4891-8162-00348fd35a21" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+var myj=read("<car><color>red</color></car>","application/xml")
+output application/json
+---
+{
+	select:	myj."car"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="readurlFlow" doc:id="4cddbe15-611f-4ef6-9ef3-d072e63d98be" >
+		<http:listener doc:name="Listener" doc:id="66ef0917-3105-4677-8637-fb078864a325" config-ref="HTTP_Listener_config" path="url" />
+		<ee:transform doc:name="Transform Message" doc:id="55ef29ff-28ed-4e93-baf1-99e22c911c72" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+var myj={
+	a:avg([1,1000]),
+	b:avg([1,2,3])
+}
+output application/xml
+---
+readUrl("classpath://mj.json","application/json")]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="mapFlow" doc:id="91f0334e-8239-4290-93e6-39961d67a865" >
+		<http:listener doc:name="Listener" doc:id="2e2a1d64-a37b-465c-a0b7-3a8cc7ba16da" config-ref="HTTP_Listener_config" path="mapp" />
+		<ee:transform doc:name="Transform Message" doc:id="e15c5776-bceb-49e8-86d7-6bfdb7e87c61" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	(
+		["a","v","s"] map {
+		($$):$
+		}
+	)
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="map1Flow" doc:id="6b3134b8-3102-4ce0-af5a-98965f25d375">
+		<http:listener doc:name="Listener" doc:id="ad498b4d-5742-4cfd-a977-2f1eb2086bc7" config-ref="HTTP_Listener_config" path="map1" />
+		<ee:transform doc:name="Transform Message" doc:id="79bc5ab1-b811-4f64-9db6-25f5f6570a48">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	(
+		["a","v","s"] map ((value,index)->{
+			(index):value
+})
+	)
+}
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="pluckFlow" doc:id="56b6adff-c541-4812-bd04-f1a1d5474a9e" >
+		<http:listener doc:name="Listener" doc:id="4cda9b7e-64d5-4172-bec3-6b3a9af06dda" config-ref="HTTP_Listener_config" path="pluck" />
+		<ee:transform doc:name="Transform Message" doc:id="bdf9f44f-b6ba-46af-8d1b-c64b338edf77" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "0": "a",
+  "1": "v",
+  "2": "s"
+} pluck ((value)-> value)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="mapandmergeFlow" doc:id="6a7a98ab-6462-4f59-8b12-285bdc5ce270" >
+		<http:listener doc:name="Listener" doc:id="4f12c63f-23d8-4214-82dd-97e842f163d8" config-ref="HTTP_Listener_config" path="mapandmerge" />
+		<ee:transform doc:name="Transform Message" doc:id="08e460a0-142a-474a-b474-603f19758348" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+var myVar = [
+  { bookId: 101,
+    title: "world history",
+    price: "19.99"
+  },
+  {
+    bookId: 202,
+    title: 'the great outdoors',
+    price: "15.99"
+  }
+]
+var myVar2 = [
+  {
+    bookId: 101,
+    author: "john doe"
+  },
+  {
+    bookId: 202,
+    author: "jane doe"
+  }
+]
+output application/json
+---
+myVar map(item,index) -> using(id=item.bookId){
+	id:id,
+	topic:item.title,
+	cost:item.price,
+	(myVar2 filter ($.*bookId contains id) map (item)->{
+		author:item.author
+	})
+}
+
+
+
+
+
+
+
+
+
+
+
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
