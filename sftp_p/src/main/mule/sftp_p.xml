@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/current/mule-sftp.xsd">
+	<flow name="sftp_pFlow" doc:id="7a06c9b5-0ca7-44d2-a559-e716b77536cb" >
+		<scheduler doc:name="Scheduler" doc:id="5d9ade23-f86f-4060-a01f-bd9f8f083793" >
+			<scheduling-strategy >
+				<fixed-frequency />
+			</scheduling-strategy>
+		</scheduler>
+		<logger level="INFO" doc:name="Logger" doc:id="38fdd918-7be9-41f7-bd0f-65ee722b93f1" message="befor payload #[payload]"/>
+		<sftp:read doc:name="Read" doc:id="7b3ed3c9-dc28-4b21-b703-19ca3f0c82f7" />
+		<logger level="INFO" doc:name="Logger" doc:id="5e0426ef-9ebd-4482-8da4-39e06299e644" message="after payload #[payload]"/>
+	</flow>
+</mule>
