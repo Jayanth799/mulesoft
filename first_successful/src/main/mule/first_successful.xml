@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="f4726964-12f4-424f-a82b-7b387ee6ab74" >
+		<http:listener-connection host="0.0.0.0" port="8115" />
+	</http:listener-config>
+	<flow name="first_successfulFlow" doc:id="32b46008-8245-424e-b354-f7304a583df9" >
+		<http:listener doc:name="Listener" doc:id="12dff62f-c712-430c-8386-6fafbb51444c" config-ref="HTTP_Listener_config" path="fs"/>
+		<set-variable value="1" doc:name="Set Variable" doc:id="1baaa4c3-284f-401b-82cc-f2104f455fed" variableName="var1"/>
+		<set-variable value="2" doc:name="Set Variable" doc:id="5f5340b4-d545-485d-bcc1-88073453d04b" variableName="var2"/>
+		<first-successful doc:name="First Successful" doc:id="af76e2a8-7b56-4b64-8d97-70c79a460f98" >
+			<route >
+				<logger level="INFO" doc:name="Logger" doc:id="3e1c03e3-d207-47f9-9566-dd94eddb93d6" message="first process"/>
+				<set-payload value="#[vars.var2]" doc:name="Set Payload" doc:id="0db04c6a-e3e2-4105-9ac1-a71a100b49a1" />
+				<logger level="INFO" doc:name="Logger" doc:id="34cb3109-2cd0-4a59-96e2-57be879f497e" message="first process end"/>
+				<raise-error doc:name="Raise error" doc:id="32007ef0-75d4-489a-a01d-c71ddc38b9d9" type="TRANSFORMATION"/>
+			</route>
+			<route >
+				<logger level="INFO" doc:name="Logger" doc:id="2c81fbe3-89ee-45cb-8275-4dfe645131bc" message="second process"/>
+				<set-payload value="#[vars.var1]" doc:name="Set Payload" doc:id="c68ce159-6f04-4630-ab75-dd8d01f8faef" />
+				<logger level="INFO" doc:name="Logger" doc:id="1189d8c1-f33b-4201-b2f0-ec5e58ec1469" message="second process ends"/>
+			</route>
+		</first-successful>
+	</flow>
+</mule>
