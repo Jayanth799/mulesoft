@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="db26e2c3-bf33-48ac-b600-3c04c924c7d0" >
+		<http:listener-connection host="0.0.0.0" port="8125" />
+	</http:listener-config>
+	<flow name="function_compositionFlow" doc:id="c71ef784-679d-409e-8be7-48055a3779a4" >
+		<http:listener doc:name="Listener" doc:id="516b6410-0f33-4c93-ac11-f28ca64542ed" config-ref="HTTP_Listener_config" path="fc"/>
+		<ee:transform doc:name="Transform Message" doc:id="73776146-c702-4204-bfe0-f054b578e66f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var collaborators =
+{
+    Max: {role: "admin", id: "01"},
+    Einstein: {role: "dev", id: "02"},
+    Astro: {role: "admin", id: "03"},
+    Blaze: {role: "user", id: "04"}
+}
+---
+collaborators pluck ((value,key,index)->{
+	"name":key,
+	"Role":upper(value.role),
+	"Id":value.id
+})
+filter ((item,index) -> item.Role=="ADMIN")]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="function_compositionFlow1" doc:id="a4553364-754f-44f1-a192-c047ff6ae39b" >
+		<http:listener doc:name="Listener" doc:id="dfe29c23-4eba-46f3-9de7-7cb01651bdee" config-ref="HTTP_Listener_config" path="fc1"/>
+		<ee:transform doc:name="Transform Message" doc:id="160603e4-7131-489d-a3be-4818963fc580" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+var collaborators =
+{
+    Max: {role: "admin", id: "01"},
+    Einstein: {role: "dev", id: "02"},
+    Astro: {role: "admin", id: "03"},
+    Blaze: {role: "user", id: "04"}
+}
+output application/json
+---
+filter(
+	pluck(
+		collaborators, (value,key,index)->{
+			"Name":key,
+			"Role":upper(value.role),
+			"Id":value.id
+		}),
+(item,index)-> item.Role == "ADMIN")]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="lambdaFlow2" doc:id="fe004e5d-8a0f-44f3-a87d-7136549b6fda" >
+		<http:listener doc:name="Listener" doc:id="25bc9606-eb47-449d-8066-b4b82fbae6d2" config-ref="HTTP_Listener_config" path="lambda"/>
+		<ee:transform doc:name="Transform Message" doc:id="28816287-fbed-484d-a47c-f60931bd1318" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+["Max", "the", "Mule"] map (item, index) -> index ++ " - " ++ item]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="function_compositionFlow2" doc:id="1b6afb53-2338-4f61-b118-7f2017f446c8" >
+	<http:listener doc:name="Listener" doc:id="983614a0-06ef-4b99-9d7a-396e4835f8e6" config-ref="HTTP_Listener_config" path="dwlex">
+		<http:response >
+    	<http:body ><![CDATA[#[${file::somefile.dwl}]]]></http:body>
+ 		 </http:response>
+ 	 </http:listener>
+<choice doc:name="Choice"  >
+  <when expression="${file::someFile.dwl}" >
+    <set-payload value="It's greater than 4!" doc:name="Set Payload"  />
+  </when>
+  <otherwise >
+    <set-payload value="It's less than 4!" doc:name="Set Payload" />
+  </otherwise>
+</choice>
+	</flow>
+</mule>
