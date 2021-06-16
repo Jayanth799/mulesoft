@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="02e82284-e536-4079-a4aa-02b5a68bc25c" >
+		<http:listener-connection host="0.0.0.0" port="8128" />
+	</http:listener-config>
+	<flow name="selectorsFlow" doc:id="60b8abbc-cb00-4e11-a93b-72340a32fbaa" >
+		<http:listener doc:name="Listener" doc:id="6f3b80db-5d64-4f31-b999-51361f55464d" config-ref="HTTP_Listener_config" path="se"/>
+		<ee:transform doc:name="Transform Message" doc:id="e6011bc3-c746-4050-8cd5-c21bc1eb6137" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var j=[
+  {
+    "name": "Arg"
+  },
+  {
+    "name": "Japan"
+  }
+]
+---
+j.name]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="singleselectorflow" doc:id="7de9c82d-791c-48e2-90cf-a56c1820f07e" >
+		<http:listener doc:name="Listener" doc:id="167f051f-b3b8-437e-a941-73aecc23b175" config-ref="HTTP_Listener_config" path="ss"/>
+		<ee:transform doc:name="Transform Message" doc:id="c7dff47d-bed5-43ea-b7ed-f48d35ae4cb3" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+var j={"name": "Data Weave"}
+output application/json
+---
+j.name]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="selectorsFlow1" doc:id="76db1cee-3f16-412b-bdaa-604d47739d14" >
+		<http:listener doc:name="Listener" doc:id="2754970a-3c99-4d06-a929-50764105e57f" config-ref="HTTP_Listener_config" path="att"/>
+		<ee:transform doc:name="Transform Message" doc:id="3bf268a0-1264-46c9-b18b-a4b7dd6f32fe" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload.user.@name]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="selectorsFlow2" doc:id="7202d895-6d9f-413c-85f5-a1e8503ebd97" >
+		<http:listener doc:name="Listener" doc:id="5374dfca-789e-4511-97cc-858b921a73a8" config-ref="HTTP_Listener_config" path="mvs"/>
+		<ee:transform doc:name="Transform Message" doc:id="6ba683eb-9882-4956-8cc9-11d09e954ee2" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+var j=read("<users><user>Weave</user><user>BAT</user><user>TF</user></users>","application/xml")
+output application/json
+---
+j.users.*user]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="selectorsFlow3" doc:id="45f9d01f-4299-489b-80fe-04f986808eac" >
+		<http:listener doc:name="Listener" doc:id="857f0879-342e-4b51-b0b4-38fc73af3bdb" config-ref="HTTP_Listener_config" path="sed"/>
+		<ee:transform doc:name="Transform Message" doc:id="134018f2-8645-48e2-bbf1-f5dd45f3e395" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+var j=read("<users>
+  <user>
+    <name>Weave</name>
+    <user>
+      <name>BAT</name>
+      <user>
+        <name>BDD</name>
+      </user>
+    </user>
+  </user>
+</users>","application/xml")
+output application/json
+---
+j..]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="selectorsFlow4" doc:id="d2e020ef-7f1f-4fc8-8bf1-a5c866d3b8bc" >
+		<http:listener doc:name="Listener" doc:id="dd280cd0-f84d-4df0-addf-1f22ccfeb23c" config-ref="HTTP_Listener_config" path="sdv"/>
+		<ee:transform doc:name="Transform Message" doc:id="86d7c4b0-9635-49c1-89c2-bf4971a62d10" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+var j=read("<users>
+  <user>
+    <name>Weave</name>
+    <user>
+      <name>BAT</name>
+      <name>Munit</name>
+      <user>
+        <name>BDD</name>
+      </user>
+    </user>
+  </user>
+</users>","application/xml")
+output application/json
+---
+j..name]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="selectorsFlow5" doc:id="5c267f17-9f39-4e9e-90af-d51a9e0d5c85" >
+		<http:listener doc:name="Listener" doc:id="fbb53573-145b-4b14-97d2-607c5f2fc606" config-ref="HTTP_Listener_config" path="dws"/>
+		<ee:transform doc:name="Transform Message" doc:id="afacc4b7-ffbc-4ba6-bfe6-2e8dce25e62f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+var j=read("<users>
+  <user>
+    <name>Weave</name>
+    <user>
+      <name>BAT</name>
+      <name>Munit</name>
+      <user>
+        <name>BDD</name>
+      </user>
+    </user>
+  </user>
+</users>","application/xml")
+output application/json
+---
+j.users..*name]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
