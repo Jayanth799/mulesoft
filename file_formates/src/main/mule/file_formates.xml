@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="42bd3213-a75d-4586-a670-ebca1b17008f" >
+		<http:listener-connection host="0.0.0.0" port="8126" />
+	</http:listener-config>
+	<flow name="csvFlow" doc:id="6bad028c-81da-4c1d-a2f4-40c8cbf36e33" >
+		<http:listener doc:name="Listener" doc:id="e7f4f3db-11d8-4d70-be5c-4c0cc006f333" config-ref="HTTP_Listener_config" path="ff"/>
+		<ee:transform doc:name="Transform Message" doc:id="fd71d568-d693-4479-99ca-1c83bcb18c2c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/csv
+---
+[{
+    username: "Mariano",
+    age: 35,
+    phone: "213",
+    housenum: "123"
+},
+{
+    username: "Leandro",
+    age: 29,
+    phone: "213",
+    housenum: "123"
+},
+{
+    username: "Christian",
+    age: 25,
+    phone: "213",
+    housenum: "123"
+}]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="file_formatesFlow" doc:id="27e728c6-30d4-4c90-b435-e4cab78258cf">
+		<http:listener doc:name="Listener" doc:id="9e69239d-d4aa-4a7d-a8f2-06aa89764fce" config-ref="HTTP_Listener_config" path="avro" />
+		<ee:transform doc:name="Transform Message" doc:id="ab3eba97-ebbb-4323-a68a-a91c781276f4">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/avro schemaUrl="classpath://schema.json"
+---
+[{
+    username: "Mariano",
+    age: 35,
+    phone: "213",
+    housenum: "123"
+},
+{
+    username: "Leandro",
+    age: 29,
+    phone: "213",
+    housenum: "123"
+},
+{
+    username: "Christian",
+    age: 25,
+    phone: "213",
+    housenum: "123"
+}]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="file_formatesFlow1" doc:id="4ef5117a-6f43-415e-9231-cc8979bb9c66" >
+		<http:listener doc:name="Listener" doc:id="d0d23f3f-7294-4d36-a0b7-a3dce7fbd74c" config-ref="HTTP_Listener_config" path="dw"/>
+		<ee:transform doc:name="Transform Message" doc:id="c1f30edc-0024-4bfe-ae7e-e0e58f6c8bd7" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/dw
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="file_formatesFlow2" doc:id="9e94a5fb-9aef-47b2-acc2-d3420513150f" >
+		<http:listener doc:name="Listener" doc:id="2c68f86e-f964-4ca6-ae90-6fdbf7fe335e" config-ref="HTTP_Listener_config" path="xlsx"/>
+		<ee:transform doc:name="Transform Message" doc:id="8eb7e2c2-76cc-48a7-9abe-d7b2c204129e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/dw
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="file_formatesFlow3" doc:id="d7094411-ccf1-4361-83dd-0cc4e2264a03" >
+		<http:listener doc:name="Listener" doc:id="94928820-81d0-40bd-a5b1-f1eb8e90333a" config-ref="HTTP_Listener_config" path="xls" outputMimeType="application/xlsx; streaming=true"/>
+		<ee:transform doc:name="Transform Message" doc:id="52e793b6-56b2-4e71-b2ed-95ef65d0e88a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload."Sheet Name" map ((row) -> {
+    foo: row.a,
+    bar: row.b
+})]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	
+</flow>
+	<flow name="file_formatesFlow4" doc:id="7ad61c33-610c-456c-9300-358794df72e8" >
+		<http:listener doc:name="Listener" doc:id="d01f515f-963d-4059-85c7-c1e6717fbc87" config-ref="HTTP_Listener_config" path="json"/>
+		<ee:transform doc:name="Transform Message" doc:id="7a2c27d4-065a-4fed-9cca-c7dc434130f9" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+friends: payload.friends.*name map ((item,index)->{name:item})]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
