@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="fd6a4246-88bd-47f2-95ca-72b6370d4b6d" >
+		<http:listener-connection host="0.0.0.0" port="8132" />
+	</http:listener-config>
+	<flow name="variablesFlow" doc:id="477875b6-f7aa-4aa1-bd85-47abb50181bd" >
+		<http:listener doc:name="Listener" doc:id="c6c68b40-26a0-4f29-b327-e66cfda297ba" config-ref="HTTP_Listener_config" path="var"/>
+		<ee:transform doc:name="Transform Message" doc:id="cef054e3-8d17-45b2-9388-3e729016b979" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+
+var msg="hello"
+var msg2=(x="ignore")->"hello"
+var toUpper=(aString)->upper(aString)
+
+var combined=(function,msg="universe")->function(msg++" world ")
+
+output application/json
+---
+{
+	msg:msg,
+	msg2:msg2(),
+	toUpper: toUpper(msg),
+	combined: combined(toUpper),
+	ombined2: combined((x)->lower(x)++"today",msg)
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="variablesFlow1" doc:id="da3e1353-4c7e-4e9d-b5c3-b50a84c94dcc" >
+		<http:listener doc:name="Listener" doc:id="6f59e05b-8883-490c-b780-81678df46289" config-ref="HTTP_Listener_config" path="array"/>
+		<ee:transform doc:name="Transform Message" doc:id="1e22216d-8143-4c59-bdb8-c39bcbfdad6c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+var numberArray=[1,2,3,4,5]
+var stringArray=["jay","j","a","y"]
+output application/json
+---
+{
+	numberArray: numberArray map (item,index)->item*item,
+	StringArray: stringArray map (item,index)->index++"-"++ upper(item)
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="globalvariablesFlow2" doc:id="2b9497f7-89d9-4088-81b0-99d2fc46cf46" >
+		<http:listener doc:name="Listener" doc:id="f492f66e-4b07-4370-afa0-a7145da35f36" config-ref="HTTP_Listener_config" path="gv"/>
+		<ee:transform doc:name="Transform Message" doc:id="70def899-a5cb-468d-8f0a-28c95e630aca" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+var myvar=do{
+	var language="jayanth"
+	---
+	language
+}
+output application/xml
+---
+{
+	document:{
+	language:myvar,
+	age:24
+	
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="variablesFlow2" doc:id="9a6f017d-5e04-419e-b457-71ea349e5042" >
+		<http:listener doc:name="Listener" doc:id="47e70ef5-867b-4d6e-b0fc-41b992a284e8" config-ref="HTTP_Listener_config" path="local"/>
+		<ee:transform doc:name="Transform Message" doc:id="dc2ffd89-f451-4419-b727-d48b88e3dcbf" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+do{
+	var x=5
+	---
+	3+x
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="variablesFlow3" doc:id="4ca8c57a-da2c-4444-9df6-fa5286bff427" >
+		<http:listener doc:name="Listener" doc:id="527f77c9-bef1-4e25-aac5-923d92cbc91a" config-ref="HTTP_Listener_config" path="vale"/>
+		<ee:transform doc:name="Transform Message" doc:id="41fa08da-a6ff-4753-b770-25bc6211f429" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var toUpper=(astring)->upper(astring)
+var addsuu=(msg,aFunction,suffix)->aFunction(msg ++ suffix)
+---
+addsuu("hello", toUpper,"world")]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
