@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="77423e2d-e328-4c21-9c86-18e20c37f77c" >
+		<http:listener-connection host="0.0.0.0" port="8134" />
+	</http:listener-config>
+	<flow name="mapobjectFlow" doc:id="62869545-32e4-4c9f-b498-67a9833689fa" >
+		<http:listener doc:name="Listener" doc:id="282023ff-e8e9-45e4-bf24-53d38d7c5902" config-ref="HTTP_Listener_config" path="mo"/>
+		<ee:transform doc:name="Transform Message" doc:id="b6a543be-f0de-42ec-8b50-2f6f17813395" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+var pay={
+    "books": [
+      {
+        "-category": "cooking",
+        "title":"Everyday Italian",
+        "author": "Giada De Laurentiis",
+        "year": "2005",
+        "price": "30.00"
+      },
+      {
+        "-category": "children",
+        "title": "Harry Potter",
+        "author": "J K. Rowling",
+        "year": "2005",
+        "price": "29.99"
+      },
+      {
+        "-category": "web",
+        "title":  "XQuery Kick Start",
+        "author": [
+          "James McGovern",
+          "Per Bothner",
+          "Kurt Cagle",
+          "James Linn",
+          "Vaidyanathan Nagarajan"
+        ],
+        "year": "2003",
+        "price": "49.99"
+      },
+      {
+        "-category": "web",
+        "-cover": "paperback",
+        "title": "Learning XML",
+        "author": "Erik T. Ray",
+        "year": "2003",
+        "price": "39.95"
+      }
+    ]
+}
+output application/xml
+---
+items: pay.books map(item,index)->{
+	book: item mapObject(value,key)->{
+		(upper(key)):value
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
