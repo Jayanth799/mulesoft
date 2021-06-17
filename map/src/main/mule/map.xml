@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="098c67f5-950e-49d6-8f25-6430d0492d26" >
+		<http:listener-connection host="0.0.0.0" port="8133" />
+	</http:listener-config>
+	<flow name="mapFlow" doc:id="32bf2b12-3e90-45ae-8670-d9e71851b6a3" >
+		<http:listener doc:name="Listener" doc:id="fe403936-4edf-4d21-acb4-6b494ac2dc17" config-ref="HTTP_Listener_config" path="map1"/>
+		<ee:transform doc:name="Transform Message" doc:id="e8f17a55-87a1-4554-b343-c049a13b884e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+var pay={
+    "books": [
+      {
+        "-category": "cooking",
+        "title":"Everyday Italian",
+        "author": "Giada De Laurentiis",
+        "year": "2005",
+        "price": "30.00"
+      },
+      {
+        "-category": "children",
+        "title": "Harry Potter",
+        "author": "J K. Rowling",
+        "year": "2005",
+        "price": "29.99"
+      },
+      {
+        "-category": "web",
+        "title":  "XQuery Kick Start",
+        "author": [
+          "James McGovern",
+          "Per Bothner",
+          "Kurt Cagle",
+          "James Linn",
+          "Vaidyanathan Nagarajan"
+        ],
+        "year": "2003",
+        "price": "49.99"
+      },
+      {
+        "-category": "web",
+        "-cover": "paperback",
+        "title": "Learning XML",
+        "author": "Erik T. Ray",
+        "year": "2003",
+        "price": "39.95"
+      }
+    ]
+}
+output application/xml
+---
+items: pay.books map(item,index)->{
+	book: item mapObject(value,key)->{
+		(upper(key)):value
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="mapFlow1" doc:id="57daecc6-5fbb-43e2-8a1e-240b9ca0d55f" >
+		<http:listener doc:name="Listener" doc:id="7a53bbff-5c9b-481f-8800-b0ae399f7a48" config-ref="HTTP_Listener_config" path="map2"/>
+		<ee:transform doc:name="Transform Message" doc:id="81a545ed-443a-48ed-8049-63929ce731f0" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+var pay={
+    "books": [
+      {
+        "-category": "cooking",
+        "title": {
+          "-lang": "en",
+          "#text": "Everyday Italian"
+        },
+        "author": "Giada De Laurentiis",
+        "year": "2005",
+        "price": "30.00"
+      },
+      {
+        "-category": "children",
+        "title": {
+          "-lang": "en",
+          "#text": "Harry Potter"
+        },
+        "author": "J K. Rowling",
+        "year": "2005",
+        "price": "29.99"
+      },
+      {
+        "-category": "web",
+        "title": {
+          "-lang": "en",
+          "#text": "XQuery Kick Start"
+        },
+        "author": [
+          "James McGovern",
+          "Per Bothner",
+          "Kurt Cagle",
+          "James Linn",
+          "Vaidyanathan Nagarajan"
+        ],
+        "year": "2003",
+        "price": "49.99"
+      },
+      {
+        "-category": "web",
+        "-cover": "paperback",
+        "title": {
+          "-lang": "en",
+          "#text": "Learning XML"
+        },
+        "author": "Erik T. Ray",
+        "year": "2003",
+        "price": "39.95"
+      }
+    ]
+}
+output application/json
+---
+items: pay.books map {
+	category: "book",
+	price:$.price,
+	id:($$),
+	properties: {
+		title:$.title,
+		author:$.author,
+		year:$.year
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
