@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="bf353a3c-ebd3-4732-9634-3be66aa19a86" >
+		<http:listener-connection host="0.0.0.0" port="8131" />
+	</http:listener-config>
+	<flow name="typesystemFlow" doc:id="a9ee664e-dfe6-4978-b808-d8c2aadf7804" >
+		<http:listener doc:name="Listener" doc:id="5183a88b-1c50-4d45-8ac7-1e20c0e7383c" config-ref="HTTP_Listener_config" path="ts"/>
+		<ee:transform doc:name="Transform Message" doc:id="6a6832b2-5281-4efc-bf0d-66918d5392e1" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::core::Strings
+output application/json
+fun toUser(id: Number, userName: String): String = "you called the function toUser!"
+---
+toUser("100","jayanth")]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="repeateFlow1" doc:id="403310a2-c74e-41da-98f5-101727cebbaa" >
+		<http:listener doc:name="Listener" doc:id="bae97640-e231-42fa-96e1-3955c66b4db2" config-ref="HTTP_Listener_config" path="re"/>
+		<ee:transform doc:name="Transform Message" doc:id="a44a81bb-6b79-4ab0-871e-c301d03935fd" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::core::Strings
+output application/json
+---
+repeat("jay",3)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="repeateFlow" doc:id="a84a1951-dc20-4a9c-8fe1-948c0253d5fb" >
+		<http:listener doc:name="Listener" doc:id="e118f73e-48b6-45ae-9ddf-2cc6f18f567d" config-ref="HTTP_Listener_config" path="re1" />
+		<ee:transform doc:name="Transform Message" doc:id="61df4514-cac2-4831-9387-971fa29dc135" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::core::Strings
+output application/json
+---
+repeat(Null,3)
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="RepeateFlow1" doc:id="e9db0819-5bcb-426b-8c59-c7039b141cb4" >
+		<http:listener doc:name="Listener" doc:id="3c79ae80-79b3-42c8-89ee-f53bd6a0b054" config-ref="HTTP_Listener_config" path="re2" />
+		<ee:transform doc:name="Transform Message" doc:id="caf38405-2dd8-4b59-a979-09ed00ee400b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::core::Strings
+output application/json
+---
+isNumeric(Null)
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="typesystemFlow1" doc:id="2fd70299-82fd-40e0-9c30-c8ffc783208f" >
+		<http:listener doc:name="Listener" doc:id="abb9a6cc-6162-47b2-9e98-a542750073aa" config-ref="HTTP_Listener_config" path="pera"/>
+		<ee:transform doc:name="Transform Message" doc:id="228c3ade-fbba-435b-989a-663dea13fbf2" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+type FileData<Content> = {
+    data: Content,
+    name: String
+}
+
+fun read(file: FileData<String>) =  "This is a text file with data " ++ file.data
+fun read(file: FileData<Binary>) =  "This is a binary file with data " ++ (file.data as String {base: "64"})
+output application/json
+---
+{
+  binary: read({data: "Hello World" as Binary, name: "myFile.bin"}),
+  text: read({data: "Hello World", name: "myFile.txt"})
+  }]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
