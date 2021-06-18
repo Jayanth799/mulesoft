@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="478024be-d634-4e14-8be5-9d46715ed978" >
+		<http:listener-connection host="0.0.0.0" port="8136" />
+	</http:listener-config>
+	<flow name="filterobjectFlow" doc:id="b7c9fd30-a00b-4ac7-b896-0944654acfd7" >
+		<http:listener doc:name="Listener" doc:id="d00e96d0-1a9b-45d0-9d91-fbcdd66fe4a4" config-ref="HTTP_Listener_config" path="fo"/>
+		<ee:transform doc:name="Transform Message" doc:id="9d030701-e625-46c9-a131-ada40103d8aa" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{j:"jay",s:"sai",r:"ramesh"} filterObject (value)->value=="sai"]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="filterobjectFlow1" doc:id="f1a791c8-4d95-429a-8ccb-e7376e3945c7" >
+		<http:listener doc:name="Listener" doc:id="14868021-fbb2-4548-825e-017d6c666d4b" config-ref="HTTP_Listener_config" path="fo1"/>
+		<ee:transform doc:name="Transform Message" doc:id="786aeb5a-2783-4d4b-8c4c-94e66f145218" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{letter1:"a",letter2:"b",id:1} filterObject ((velue,key)-> key startsWith"letter")]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="filterobjectssFlow" doc:id="365610a2-ab08-409b-b8ac-ac604363f6fe" >
+		<http:listener doc:name="Listener" doc:id="b22f9a0d-0cb5-4d50-b631-6b9c252d0a94" config-ref="HTTP_Listener_config" path="fo2" />
+		<ee:transform doc:name="Transform Message" doc:id="edbadf47-97ae-4a4b-a407-363b99c66d85" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{letter1:"a",letter2:"b",id:1} filterObject ( ($$) startsWith"letter")]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="Copy_of_filterobjectssFlow" doc:id="a9b26764-dec6-4307-aea0-96914c498260" >
+		<http:listener doc:name="Listener" doc:id="c46fed0b-bc3f-4b9b-93cd-806b3d96f1bc" config-ref="HTTP_Listener_config" path="fo3" />
+		<ee:transform doc:name="Transform Message" doc:id="ae0dd7d1-14d4-4652-8a6d-ef5301b51820" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{letter1:"a",letter2:"b",id:1} filterObject ((value,key,index)->index<=1)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="filterobjectFlow2" doc:id="f09fc496-34bb-427f-9457-e3274ee0daa2" >
+		<http:listener doc:name="Listener" doc:id="cbf6c0cc-7efc-491b-af3d-27b91c8c3bd3" config-ref="HTTP_Listener_config" path="fo5"/>
+		<ee:transform doc:name="Transform Message" doc:id="d640833f-c707-4ec6-8bf7-c803246c1102" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var o = {
+    str1 : "String 1",
+    str2 : "String 2",
+    str3 : null,
+    str4 : "String 4",
+}
+---
+o filterObject ($)!=null]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
