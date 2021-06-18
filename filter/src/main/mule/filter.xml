@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="b02194c0-276c-4ec2-8408-9c4777ae7b02" >
+		<http:listener-connection host="0.0.0.0" port="8135" />
+	</http:listener-config>
+	<flow name="filterFlow" doc:id="0ea51ca0-fd12-427b-a3f5-718e9dc2184e" >
+		<http:listener doc:name="Listener" doc:id="af0aaa85-66d1-40f8-aee8-bf2570327628" config-ref="HTTP_Listener_config" path="flter"/>
+		<ee:transform doc:name="Transform Message" doc:id="b147d5b1-13ff-4ec8-abc2-24e185d982c6" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+[1,2,3,4,5] filter (value,index)->(index>2)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="filterFlow1" doc:id="d42cdbf5-c0be-4045-9b23-0f019e0deafb" >
+		<http:listener doc:name="Listener" doc:id="a4e5bc04-8dea-4447-8a8a-13297a30522e" config-ref="HTTP_Listener_config" path="ft1"/>
+		<ee:transform doc:name="Transform Message" doc:id="a2edd9f0-04dc-43a6-b248-ef0324fb76a7" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+[1,2,3,4,5] filter (value,index)->(value>2)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="filterFlow2" doc:id="e60fcc60-c7be-4641-9b85-014d5039db0e" >
+		<http:listener doc:name="Listener" doc:id="b4afddf3-d866-4101-a442-019af7ec34a2" config-ref="HTTP_Listener_config" path="ft2"/>
+		<ee:transform doc:name="Transform Message" doc:id="c3474061-e959-47e8-9460-512b5bdf771b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+[1,2,3,4,5,8,6,7] filter (($$)>2 and ($)>4)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="filterFlow3" doc:id="4177dcb3-cc25-4cf8-80ac-728223115160" >
+		<http:listener doc:name="Listener" doc:id="e98c0b37-6fed-47cb-b7db-226269e30592" config-ref="HTTP_Listener_config" path="ft3"/>
+		<ee:transform doc:name="Transform Message" doc:id="7a46f255-3e5a-4405-9c32-fdf0cfb56299" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var users = [
+   {
+      "user": {
+         "name": "123",
+         "lastName": "Smith"
+      },
+      "error": "That name doesn't exists"
+   },
+   {
+      "user": {
+         "name": "John",
+         "lastName": "Johnson"
+      },
+      "error": null
+   }
+]
+---
+users filter ((item,index)-> item.error != null)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="filterFlow4" doc:id="946fac7d-13e1-40a5-8e83-0bb81fbbc9fb" >
+		<http:listener doc:name="Listener" doc:id="42ec49c4-8209-44f4-abc9-e29baf8d9ef6" config-ref="HTTP_Listener_config" path="ft5"/>
+		<ee:transform doc:name="Transform Message" doc:id="cce0e314-c9fb-4df3-9d37-60b0e1ee3cee" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var pay={
+  "Id": "1184001100000000517",
+  "marketCode": "US",
+  "languageCode": "en-US",
+  "profile": {
+  "base": {
+     "username": "TheMule",
+     "activeInd": "R",
+     "phone": [
+       {
+          "activeInd": "Y",
+          "type": "mobile",
+          "primaryInd": "Y",
+          "number": "230678123"
+       },
+       {
+         "activeInd": "N",
+         "type": "mobile",
+         "primaryInd": "N",
+         "number": ""
+       },
+       {
+          "activeInd": "Y",
+          "type": "mobile",
+          "primaryInd": "Y",
+          "number": "154896523"
+       }
+
+      ]
+    }
+  }
+ }
+---
+{
+	id: pay.Id,
+    markCode: pay.marketCode,
+    languageCode: pay.languageCode,
+    username: pay.profile.base.username,
+    phonenumber: (pay.profile.base.phone filter ( $.primaryInd=="Y" and $.activeInd=="Y")).number default []
+    }]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
