@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="37bb59b9-be17-4a76-9b84-fc314b78af05" >
+		<http:listener-connection host="0.0.0.0" port="8137" />
+	</http:listener-config>
+	<flow name="pluckFlow" doc:id="5bc2e849-996a-4121-874d-b3eece2d29a9" >
+		<http:listener doc:name="Listener" doc:id="7fe62514-0ffc-41c0-8e93-5034a49e6a62" config-ref="HTTP_Listener_config" path="p"/>
+		<ee:transform doc:name="Transform Message" doc:id="924db0b2-e168-4e38-bdc4-17dc5a52e46c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{"a":"b","c":"d"} pluck ((value,key,index)->(index):{(key):value})]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="pluckFlow1" doc:id="4320bb84-2555-460d-9c8f-d0d92da25631" >
+		<http:listener doc:name="Listener" doc:id="6bf0e331-0045-4a65-83e8-8f17ad7f725d" config-ref="HTTP_Listener_config" path="p1"/>
+		<ee:transform doc:name="Transform Message" doc:id="f2f10b89-17c5-4069-a6fd-420aa80392af" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var readXml = read("<prices>
+    <basic>9.99</basic>
+    <premium>53.00</premium>
+    <vip>398.99</vip>
+    </prices>", "application/xml")
+---
+results:{
+	keys: readXml.prices pluck($$),
+	values:readXml.prices pluck($),
+	indices:readXml.prices pluck($$$)
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
