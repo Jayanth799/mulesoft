@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="a00bbf70-3177-452f-bf76-8d64464bb51e" >
+		<http:listener-connection host="0.0.0.0" port="8138" />
+	</http:listener-config>
+	<flow name="matchpatternFlow" doc:id="8da48f40-36f6-4679-9115-e690f9e765eb" >
+		<http:listener doc:name="Listener" doc:id="3266b5dc-7e9d-4654-8772-2a51445b2cc4" config-ref="HTTP_Listener_config" path="mp"/>
+		<ee:transform doc:name="Transform Message" doc:id="c9e7cb61-1a6e-4483-ab8d-e3cd6efd5848" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+"hello world" match {
+	case word matches /(hello)\s\w+/-> word[1] as String ++ " was matched"
+	case literalMatch: "Hello world" -> upper(literalMatch)
+	case hasOne if( hasOne is Object and hasOne.three? ) -> hasOne.three
+	else -> $
+	
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="matchpatternFlow1" doc:id="9b0bb07d-a10d-4c63-a40d-a724049b6fd9" >
+		<http:listener doc:name="Listener" doc:id="40e16fbf-e4fe-4e5e-9e92-0167a4161ece" config-ref="HTTP_Listener_config" path="pm1"/>
+		<ee:transform doc:name="Transform Message" doc:id="28db888d-d0b9-4b58-af0f-b97db66050d6" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var m={"string":"jay"}
+---
+{
+	a:m.string match {
+		case "Jay" -> true
+		case "jay" -> false
+	},
+	b: m.string match{
+		case str: "jay" -> {"matches":true,value:str}
+		case str: "Jay" -> {"matches":true,value:str}
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="expressionsFlow2" doc:id="dc262905-7fb8-49de-b1cb-593148e792ad" >
+		<http:listener doc:name="Listener" doc:id="e7cabf10-f906-4e95-86dd-5f3ee5aabd55" config-ref="HTTP_Listener_config" path="pm2"/>
+		<ee:transform doc:name="Transform Message" doc:id="9e622616-ea67-485f-9f79-3637e83235c0" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var v={
+	name:"sai",
+	id:5
+}
+---
+{
+	a: v.name match {
+		case str if str == "sai"-> str++" hiii"
+		case str if str != "sai"->str++" bye"
+	},
+	b: v.id match {
+		case i if i==5 -> "equal to 5"
+		case i if i<5 -> "less then 5"
+		case i if i>5 -> "greater then 5"
+		
+	}
+	
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="matchpatternofdatatypesFlow2" doc:id="e3fe30a8-1e55-4904-8802-7f6b393fc571" >
+		<http:listener doc:name="Listener" doc:id="a8d4f168-131b-41df-8f3b-b4672674ca79" config-ref="HTTP_Listener_config" path="pm4"/>
+		<ee:transform doc:name="Transform Message" doc:id="2b350725-89c4-4e2a-9f44-1d9fc70d25ad" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var myInput =
+{
+  "a": "Emiliano",
+  "b": 3.14
+}
+---
+{
+	a: myInput.a match {
+		case is Object ->"object"
+		case is String ->"string"
+		case is Number -> "Number"
+		case is Null -> "null"
+		case is Boolean -> "boolean"
+		case is Array ->"array"
+		else -> "another type"
+	},
+	b:myInput.b match {
+		case y is Object ->{"type":{"object":y}}
+		case y is String ->{"type":{"string":y}}
+		case y is Number ->{"type":{"Number":y}}
+		case y is Null -> {"type":{"null":y}}
+		case y is Boolean -> {"type":{"boolean":y}}
+		case y is Array ->{"type":{"array":y}}
+		else -> {"type":{"another type":myInput.b}}
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="matchpatternFlow2" doc:id="8b78cbfb-da40-45d4-90df-238b69ed05d2" >
+		<http:listener doc:name="Listener" doc:id="9e41f1ef-c6d2-46c2-9429-d9242ff03d0f" config-ref="HTTP_Listener_config" path="pm5"/>
+		<ee:transform doc:name="Transform Message" doc:id="41963ba0-a498-4867-96cb-bc87b7b00e4f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+var myInput = {
+  "phones": [
+    "+1 (415) 229-2009",
+    "(647) 456-7008"
+  ]
+}
+output application/json
+---
+{
+  a: myInput.phones map ($ match {
+     case phone matches /\+(\d+)\s\((\d+)\)\s(\d+\-\d+)/ -> { country: phone[1]}
+     case phone matches /\((\d+)\)\s(\d+\-\d+)/ -> { area: phone[1], number: phone[2] }
+   }),
+ b: myInput.phones map ($ match {
+   case phone matches /\+(\d+)\s\((\d+)\)\s(\d+\-\d+)/ -> { country: phone[1], area: phone[2], number: phone[3] }
+   case phone matches /\((\d+)\)\s(\d+\-\d+)/ -> { area: phone[1], number: phone[2] }
+ })
+}
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
